@@ -17,7 +17,7 @@ class EventEmitter {
         }
         this.on(evName, handler);
 
-        return () => this.off(evName, handler);
+        return handler;
     }
 
     off(evName, f) {
@@ -34,14 +34,38 @@ class EventEmitter {
         this.events[evName].forEach(f => f(data));
     }
 
-    map(f) {
+    map(modF) {
 
+        const parentEE = this;
+        const newEE = new EventEmitter();
+
+        const on = newEE.on;
+        newEE.on = (evName, f) => {
+
+            parentEE.on(evName, (data) =>
+                newEE.emit(evName, modF(data)
+                ))
+
+            on.call(newEE, evName, f);
+        }
+
+        const emit = newEE.emit;
+        newEE.emit = (evName, data) =>
+            emit.call(newEE, evName, modF(data))
+
+
+        return newEE;
     }
 }
 
 
-const EE = new EventEmitter();
-const cancelOnce = EE.once('test', b);
-cancelOnce();
-EE.emit('test', '5');
-EE.emit('test', 5)
+const e1 = new EventEmitter();
+const e2 = e1.map(x => {
+    return x * 2
+});
+
+e1.on('data', x => console.log('e1:', x));
+e2.on('data', x => console.log('e2:', x));
+
+e1.emit('data', 1);
+e1.emit('data', 2);
