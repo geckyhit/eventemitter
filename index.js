@@ -33,6 +33,10 @@ class EventEmitter {
     emit(evName, data) {
         this.events[evName].forEach(f => f(data));
     }
+
+    map(f) {
+
+    }
 }
 
 
@@ -40,3 +44,4 @@ const EE = new EventEmitter();
 const cancelOnce = EE.once('test', b);
 cancelOnce();
 EE.emit('test', '5');
+EE.emit('test', 5)
