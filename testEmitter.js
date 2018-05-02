@@ -3,6 +3,7 @@ module.exports = (emitter, countIterator) => {
     for (let i = 0; i < countIterator; i++) {
         emitter.on(`test${i}`, x => numberOfCompleted++)
     }
+
     for (let i = 0; i < countIterator; i++) {
         emitter.emit(`test${i}`, 1)
     }

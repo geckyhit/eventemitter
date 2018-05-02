@@ -1,5 +1,6 @@
 class EventEmitter {
     constructor() {
+        this._id = Date.now() * Math.random();
         this.events = {}
     }
 
