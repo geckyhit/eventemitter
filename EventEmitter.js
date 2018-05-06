@@ -8,12 +8,7 @@ class EventEmitter {
         if (!this.events[evName])
             this.events[evName] = []
 
-
-        // if (typeof f === 'function')
-        //     f()
-
         this.events[evName].push(f)
-        console.log('on', this._id, this.events)
     }
 
     once(evName, f) {
@@ -45,10 +40,39 @@ class EventEmitter {
         let emitter2 = new EventEmitter()
         let _on = emitter2.on.bind(emitter2)
         emitter2.on = (event, observeFn) => {
-            console.log('on in map', this._id);
             _on(event, observeFn)
             this.on(event, (arg) => {
                 observeFn(mapFn(arg))
+            })
+        }
+        return emitter2
+    }
+
+    filter(filterFn) {
+        let emitter2 = new EventEmitter()
+        let _on = emitter2.on.bind(emitter2)
+        emitter2.on = (event, observeFn) => {
+            _on(event, observeFn)
+            this.on(event, (arg) => {
+                if (filterFn(arg))
+                    observeFn(arg)
+            })
+        }
+        return emitter2
+    }
+
+    scan(scanFn, initialValue) {
+
+        let emitter2 = new EventEmitter()
+        let _on = emitter2.on.bind(emitter2)
+
+        let value = initialValue;
+
+        emitter2.on = (event, observeFn) => {
+            _on(event, observeFn)
+            this.on(event, (arg) => {
+                value = scanFn(value, arg);
+                observeFn(value);
             })
         }
         return emitter2
