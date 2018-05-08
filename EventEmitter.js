@@ -62,17 +62,16 @@ class EventEmitter {
     }
 
     scan(scanFn, initialValue) {
-
         let emitter2 = new EventEmitter()
         let _on = emitter2.on.bind(emitter2)
 
-        let value = initialValue;
+        let acc = initialValue;
 
         emitter2.on = (event, observeFn) => {
             _on(event, observeFn)
             this.on(event, (arg) => {
-                value = scanFn(value, arg);
-                observeFn(value);
+                acc = scanFn(acc, arg);
+                observeFn(acc);
             })
         }
         return emitter2
